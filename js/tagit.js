@@ -1,8 +1,8 @@
 /*
  * INFORMATION
  * ---------------------------
- * Original Developer: Matthew Hailwood @ jquery.webspirited.com
- * Current Owner/Maintainer of this Forked Version: Widen Enterprises, Inc.
+ * Owner:     jquery.webspirited.com
+ * Developer: Matthew Hailwood
  * ---------------------------
  */
 
@@ -70,11 +70,10 @@
 
         _handleEditTag: function($tagEl) {
             this._handlingEditTag = true;
+            var tagWidth = $tagEl.width();
             var index = $tagEl.index();
             var tagText = this.tags()[index].label;
             var editingTag = this.element.find('li.tagit-new');
-            this.input.width($tagEl.width());
-            this.input.autoGrowInput({comfortZone:10});
             $tagEl.before(editingTag)
                 .remove();
             this.input.val(tagText)
@@ -86,6 +85,8 @@
             }, 400);
 
             clearTimeout(this.timer);
+            this.input.width(tagWidth);
+            this.input.autoGrowInput({comfortZone:10});
             this._handlingEditTag = false;
         },
 
@@ -116,6 +117,16 @@
                 this.input.focus();
             }
 
+            this.input.data().editing = false;
+        },
+
+        _handleBlurOnEditingEmptyTag: function() {
+            this._popTagAtIndex(this.input.parent().index());
+            var lastLi = this.element.children('li').last();
+            if (!this.input.parent().is(lastLi)) {
+                this.input.parent().insertAfter(lastLi);
+            }
+            this.input.focus();
             this.input.data().editing = false;
         },
 
@@ -156,6 +167,7 @@
             this.element.html('<li class="tagit-new"><input class="tagit-input" type="text" /></li>');
 
             this.input = this.element.find(".tagit-input");
+            this.input.autoGrowInput({comfortZone:10});
 
             //setup click handler
             $(this.element).click(function (e) {
@@ -255,6 +267,9 @@
                 if (self.input.val()) {
                     self._addTag(self.input.val(), self.input.data('value'));
                 }
+                else if (self.input.data().editing) {
+                    self._handleBlurOnEditingEmptyTag();
+                }
             });
 
             //define missing trim function for strings
@@ -341,6 +356,10 @@
             if (this.options.tagsChanged)
                 this.options.tagsChanged(tag.value || tag.label, 'popped', tag);
             return;
+        },
+
+        _popTagAtIndex:function (tagIndex) {
+            this._popTag({index: tagIndex});
         },
 
         _addTag:function (label, value) {

@@ -1,8 +1,8 @@
 /*
  * INFORMATION
  * ---------------------------
- * Owner:     jquery.webspirited.com
- * Developer: Matthew Hailwood
+ * Original Developer: Matthew Hailwood @ jquery.webspirited.com
+ * Current Owner/Maintainer of this Forked Version: Widen Enterprises, Inc.
  * ---------------------------
  */
 

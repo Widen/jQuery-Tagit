@@ -1,9 +1,9 @@
 It depends on [jQuery 1.7.2](http://jquery.com). and [jQuery-ui 1.8](http://jqueryui.com) The _jQuery Tagit Plugin_ transforms an html unordered list into a unique tagging plugin.
 
-Why unique? Because jQuery Tagit uses jQuery UI's auto-complete plugin to supply suggestions to users as they type and has some awesome features like sortable tags.
+Why unique? Because jQuery Tagit uses jQuery UI's auto-complete plugin to supply suggestions to users as they type and has some awesome features like sortable and editable tags.
 
 > Quicklinks
-> * [Demo](http://webspirited.com/tagit)
+> * Demo is pending due to multiple changes in this forked version
 > * [Features](#features)
 > * [Options](#options)
 > * [Methods](#methods)
@@ -20,8 +20,9 @@ Why unique? Because jQuery Tagit uses jQuery UI's auto-complete plugin to supply
 * Ability to provide _initial tags_ on creation via list items
 * Option to toggle usage of a hidden select so the tags can be sent using a normal form!
 * Ability to re-arrange tags by drag and drop!
-* Optional ThemeRoller compatibility!
 * Fully HTML5 Data-attributes compliant!
+* Ability to edit tags by clicking on them
+* Hidden input adjusts its width as you type
 
 ## <a id="options" href="#options">Options</a>
 <table>
@@ -139,6 +140,20 @@ Why unique? Because jQuery Tagit uses jQuery UI's auto-complete plugin to supply
           If true the whole tag is dragable.
           If 'handle' a handle is rendered and the tag is only dragable using the handle.
       </td>
+    </tr>
+
+    <tr>
+      <td>editOnClick</td>
+      <td>Bool</td>
+      <td>false</td>
+      <td>Option to turn on the ability to edit a tag by clicking on it</td>
+    </tr>
+
+    <tr>
+      <td>callbackOnInitialTagAdd</td>
+      <td>Bool</td>
+      <td>false</td>
+      <td>Option to receive a tagsChanged callback when adding initial tags</td>
     </tr>
   </tbody>
 </table>

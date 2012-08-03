@@ -1,3 +1,12 @@
+ul input {
+    box-shadow: none !important;
+}
+
+ul.tagit li.tagit-choice .tagit-text {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
 .ui-autocomplete {
     background-color: #fff;
     position: absolute;
@@ -28,15 +37,15 @@
     line-height: 12px;
     border-bottom: 1px solid #E5E5E5;
     border-top: 1px solid #fff;
-    color: #78959D;
-    
+    color: #789d7a;
+
 }
 
 .ui-autocomplete .ui-menu-item a.ui-state-hover,
 .ui-autocomplete .ui-menu-item a.ui-state-active {
-    background-color: #c0d1e2;
+    background-color: #c0e2c0;
     color: #555;
-    border-color: #a6cef7;
+    border-color: #a6f7aa;
 }
 
 .ui-autocomplete-loading {
@@ -47,7 +56,7 @@ ul.tagit {
     cursor: text;
     overflow: auto;
     font-size: 14px;
-    width: 97%;
+    width: 400px;
     padding: 3px;
     margin-top: 2px;
     margin-right: 6px;
@@ -55,13 +64,13 @@ ul.tagit {
     border: 1px solid #E5E5E5;
     background: #fff;
     color: #555;
+    float: left;
 }
 
 ul.tagit li {
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    display: block;
-    float: left;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    display: inline-block;
     margin: 2px 5px 2px 0;
     position: relative;
 }
@@ -74,8 +83,8 @@ ul.tagit.ui-sortable li.tagit-choice a.ui-icon.ui-icon-grip-dotted-vertical{
 }
 
 ul.tagit li.tagit-choice {
-    background-color: #DEE7F8;
-    border: 1px solid #CAD8F3;
+    background-color: #dff8de;
+    border: 0px;
     padding: 2px 13px 3px 4px;
 }
 
@@ -85,8 +94,8 @@ ul.tagit li.tagit-choice.selected {
 }
 
 ul.tagit li.tagit-choice:hover {
-    background-color: #bbcef1;
-    border-color: #6d95e0;
+    background-color: #caf3cd;
+    border-color: #6de072;
 }
 
 ul.tagit li.tagit-new {
@@ -109,7 +118,7 @@ ul.tagit li.tagit-choice a.tagit-close {
     font-size: 12px;
     font-weight: bold;
     outline: medium none;
-    padding: 2px 0 2px 3px;
+    padding: 2px 7px 2px 3px;
     text-decoration: none;
     position: absolute;
     display: block;
@@ -127,10 +136,13 @@ ul.tagit input[type="text"] {
     border: none !important;
     margin: 0 !important;
     padding: 0 !important;
-    width: inherit !important;
     outline: none;
+    width: 10px;
 }
 
 .tagit-hiddenSelect {
     display:none;
 }
+
+
+

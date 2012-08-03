@@ -1,8 +1,8 @@
 /*
  * INFORMATION
  * ---------------------------
- * Owner:     jquery.webspirited.com
- * Developer: Matthew Hailwood
+ * Original Developer: Matthew Hailwood @ jquery.webspirited.com
+ * Current Owner/Maintainer of this Forked Version: Widen Enterprises, Inc.
  * ---------------------------
  */
 
@@ -10,7 +10,7 @@
     $.widget("ui.tagit", {
 
         // default options
-        options:{
+        defaults:{
             //Maps directly to the jQuery-ui Autocomplete option
             tagSource:[],
             //What keys should trigger the completion of a tag
@@ -42,7 +42,13 @@
             maxTags:undefined,
             //should 'paste' event trigger 'blur', thus potentially adding a new tag
             // (true for backwards compatibility)
-            blurOnPaste:true
+            blurOnPaste:true,
+            //true to allow editing of text in an existing tag
+            // (false for backwards compatibility)
+            editOnClick:false,
+            //true to receive a tagsChanged callback when adding initial tags
+            // (false for backwards compatibility)
+            callbackOnInitialTagAdd:false
         },
 
         _splitAt:/\ |,/g,
@@ -52,16 +58,84 @@
             enter:[13],
             space:[32],
             comma:[44, 188],
-            tab:[9]
+            tab:[9],
+            semicolon:[186, 59]
         },
 
         _sortable:{
             sorting:-1
         },
 
+        _handlingEditTag: false,
+
+        _handleEditTag: function($tagEl) {
+            this._handlingEditTag = true;
+            var index = $tagEl.index();
+            var tagText = this.tags()[index].label;
+            var editingTag = this.element.find('li.tagit-new');
+            this.input.width($tagEl.width());
+            this.input.autoGrowInput({comfortZone:10});
+            $tagEl.before(editingTag)
+                .remove();
+            this.input.val(tagText)
+                .data().editing = true;
+
+            //to ensure the cursor is placed after the last character in IE, and ensure the value is not cleared after focusing
+            setTimeout(function() {
+                editingTag.find('input').focus().val(tagText);
+            }, 400);
+
+            clearTimeout(this.timer);
+            this._handlingEditTag = false;
+        },
+
+        _handleUpdateEditedTag: function(tag) {
+            var lastLi = this.element.children('li').last();
+            if (lastLi.is(this.input.parent())) {
+                tag.element.insertBefore(this.input.parent());
+                tag.index -= 1;
+                this.tagsArray[tag.index] = tag;
+                this._popSelect($(this.tagsArray).last()[0]);
+            }
+            else {
+                tag.index = this.input.parent().index();
+                tag.element.insertBefore(this.input.parent());
+                this.input.parent().insertAfter(lastLi);
+                this.input.focus();
+                this.tagsArray[tag.index] = tag;
+                this._popSelect(tag);
+            }
+        },
+
+        _handleDuplicateEditedTag: function(tag) {
+            this._popTag(tag);
+
+            var lastLi = this.element.children('li').last();
+            if (!lastLi.is(this.input.parent())) {
+                this.input.parent().insertAfter(lastLi);
+                this.input.focus();
+            }
+
+            this.input.data().editing = false;
+        },
+
+        _initPasteSplitter: function() {
+            var splitRegex = [];
+            if ($.inArray('space', this.options.triggerKeys) > 0) {
+                splitRegex.push(' ');
+            }
+            if ($.inArray('comma', this.options.triggerKeys) > 0) {
+                splitRegex.push(',');
+            }
+            if ($.inArray('semicolon', this.options.triggerKeys) > 0) {
+                splitRegex.push(';');
+            }
+            this._splitAt = new RegExp(splitRegex.join('|'));
+        },
+
         //initialization function
         _create:function () {
-
+            this.options = $.extend(this.defaults, this.options);
             var self = this;
             this.tagsArray = [];
             this.timer = null;
@@ -76,14 +150,7 @@
                 self.options.initialTags.push({label:tag.text(), value:(tagValue ? tagValue : tag.text())});
             });
 
-            //setup split according to the trigger keys
-            self._splitAt = null;
-            if ($.inArray('space', self.options.triggerKeys) > 0 && $.inArray('comma', self.options.triggerKeys) > 0)
-                self._splitAt = /\ |,/g;
-            else if ($.inArray('space', self.options.triggerKeys) > 0)
-                self._splitAt = /\ /g;
-            else if ($.inArray('comma', self.options.triggerKeys) > 0)
-                self._splitAt = /,/g;
+            this._initPasteSplitter();
 
             //add the html input
             this.element.html('<li class="tagit-new"><input class="tagit-input" type="text" /></li>');
@@ -105,6 +172,9 @@
                     self.input.focus();
                     if (self.options.emptySearch && $(e.target).hasClass('tagit-input') && self.input.val() == '' && self.input.autocomplete != undefined) {
                         self.input.autocomplete('search');
+                    }
+                    else if (self.options.editOnClick && $(e.target).hasClass('tagit-text')) {
+                        self._handleEditTag($(e.target).parents('.tagit-choice'));
                     }
                 }
             });
@@ -142,6 +212,10 @@
 
             //setup keydown handler
             this.input.keydown(function (e) {
+                if (e.shiftKey) {
+                    return;
+                }
+
                 var lastLi = self.element.children(".tagit-choice:last");
                 if (e.which == self._keys.backspace)
                     return self._backspace(lastLi);
@@ -178,17 +252,9 @@
 
             //setup blur handler
             this.input.blur(function (e) {
-                self.currentLabel = $(this).val();
-                self.currentValue = $(this).data('value');
-                if (self.options.allowNewTags) {
-                    self.timer = setTimeout(function () {
-                        self._addTag(self.currentLabel, self.currentValue);
-                        self.currentValue = '';
-                        self.currentLabel = '';
-                    }, 400);
+                if (self.input.val()) {
+                    self._addTag(self.input.val(), self.input.data('value'));
                 }
-                $(this).val('').removeData('value');
-                return false;
             });
 
             //define missing trim function for strings
@@ -244,7 +310,16 @@
         },
 
         _addSelect:function (tag) {
-            this.select.append('<option selected="selected" value="' + tag.value + '">' + tag.label + '</option>');
+            var $optionEl = $('<option selected="selected" value="' + tag.valueUriEncoded() + '">' + tag.labelHtml() + '</option>');
+
+            if (this.select.children().length > 0 && tag.index < this.select.children('option').length) {
+                this.select.children('option')
+                    .eq(tag.index)
+                    .before($optionEl);
+            }
+            else {
+                this.select.append($optionEl);
+            }
             this.select.change();
         },
 
@@ -284,19 +359,31 @@
             if (label == "")
                 return false;
 
-            var tagExists = this._exists(label, value);
-            if (tagExists !== false) {
-                this._highlightExisting(tagExists);
-                return false;
-            }
-
             var tag = this.tag(label, value);
             tag.element = $('<li class="tagit-choice"'
                 + (value !== undefined ? ' tagValue="' + value + '"' : '') + '>'
                 + (this.options.sortable == 'handle' ? '<a class="ui-icon ui-icon-grip-dotted-vertical" style="float:left"></a>' : '')
-                + label + '<a class="tagit-close">x</a></li>');
-            tag.element.insertBefore(this.input.parent());
-            this.tagsArray.push(tag);
+                + '<span class="tagit-text">' + tag.labelHtml() + '</span><a class="tagit-close">x</a></li>');
+
+            var tagExists = this._exists(label, value);
+            if (tagExists !== false && tagExists != this.input.parent().index()) {
+                this._highlightExisting(tagExists);
+
+                if (this.input.data().editing) {
+                    tag.index = this.input.parents('.tagit-new').index();
+                    this._handleDuplicateEditedTag(tag);
+                }
+
+                return false;
+            }
+
+            if (this.input.data().editing) {
+                this._handleUpdateEditedTag(tag);
+            }
+            else {
+                tag.element.insertBefore(this.input.parent());
+                this.tagsArray.push(tag);
+            }
 
             this.input.val("");
 
@@ -304,6 +391,9 @@
                 this._addSelect(tag);
             if (this.options.tagsChanged)
                 this.options.tagsChanged(tag.label, 'added', tag.element);
+
+            this.input.data().editing = false;
+
             return true;
         },
 
@@ -377,9 +467,11 @@
         _initialTags:function () {
             var input = this;
             var _temp;
-            if (this.options.tagsChanged)
+
+            if (this.options.tagsChanged && !this.options.callbackOnInitialTagAdd) {
                 _temp = this.options.tagsChanged;
-            this.options.tagsChanged = null;
+                this.options.tagsChanged = null;
+            }
 
             if (this.options.initialTags.length != 0) {
                 $(this.options.initialTags).each(function (i, element) {
@@ -389,7 +481,10 @@
                         input._addTag(element);
                 });
             }
-            this.options.tagsChanged = _temp;
+
+            if (!this.options.callbackOnInitialTagAdd) {
+                this.options.tagsChanged = _temp;
+            }
         },
 
         _lowerIfCaseInsensitive:function (inp) {
@@ -454,9 +549,19 @@
 
         tag:function (label, value, element) {
             var self = this;
+            var encodeHtml = function (text) {
+                return $('<div/>').text(text).html()
+            };
+
             return {
                 label:label,
+                labelHtml: function() {
+                    return encodeHtml(label)
+                },
                 value:(value === undefined ? label : value),
+                valueUriEncoded: function() {
+                    return encodeURIComponent(this.value);
+                },
                 element:element,
                 index:self.tagsArray.length
             };

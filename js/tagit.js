@@ -1,20 +1,20 @@
 /*
  * INFORMATION
- * ---------------------------
+ * -------------------------------------------------------------------------
  * Original Developer: Matthew Hailwood @ jquery.webspirited.com
  * Current Owner/Maintainer of this Forked Version: Widen Enterprises, Inc.
- * ---------------------------
+ * -------------------------------------------------------------------------
  */
 
 (function ($) {
     $.widget("ui.tagit", {
 
         // default options
-        defaults:{
+        options:{
             //Maps directly to the jQuery-ui Autocomplete option
             tagSource:[],
             //What keys should trigger the completion of a tag
-            triggerKeys:['enter', 'space', 'comma', 'tab'],
+            triggerKeys:[],
             //array method for setting initial tags
             initialTags:[],
             //minimum length of tags
@@ -91,6 +91,7 @@
         },
 
         _handleUpdateEditedTag: function(tag) {
+            this.input.data().editing = false;
             var lastLi = this.element.children('li').last();
             if (lastLi.is(this.input.parent())) {
                 tag.element.insertBefore(this.input.parent());
@@ -146,7 +147,10 @@
 
         //initialization function
         _create:function () {
-            this.options = $.extend(this.defaults, this.options);
+            if (this.options.triggerKeys.length === 0) {
+                this.options.triggerKeys = ['enter', 'space', 'comma', 'tab'];
+            }
+
             var self = this;
             this.tagsArray = [];
             this.timer = null;
@@ -410,8 +414,6 @@
                 this._addSelect(tag);
             if (this.options.tagsChanged)
                 this.options.tagsChanged(tag.label, 'added', tag.element);
-
-            this.input.data().editing = false;
 
             return true;
         },

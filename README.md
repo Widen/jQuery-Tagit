@@ -3,7 +3,7 @@ It depends on [jQuery 1.7.2](http://jquery.com). and [jQuery-ui 1.8](http://jque
 Why unique? Because jQuery Tagit uses jQuery UI's auto-complete plugin to supply suggestions to users as they type and has some awesome features like sortable and editable tags.
 
 > Quicklinks
-> * Demo is pending due to multiple changes in this forked version
+> * [Demo](http://widen.github.com/jQuery-Tagit)
 > * [Features](#features)
 > * [Options](#options)
 > * [Methods](#methods)

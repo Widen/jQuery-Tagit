@@ -133,13 +133,13 @@
 
         _initPasteSplitter: function() {
             var splitRegex = [];
-            if ($.inArray('space', this.options.triggerKeys) > 0) {
+            if ($.inArray('space', this.options.triggerKeys) > -1) {
                 splitRegex.push(' ');
             }
-            if ($.inArray('comma', this.options.triggerKeys) > 0) {
+            if ($.inArray('comma', this.options.triggerKeys) > -1) {
                 splitRegex.push(',');
             }
-            if ($.inArray('semicolon', this.options.triggerKeys) > 0) {
+            if ($.inArray('semicolon', this.options.triggerKeys) > -1) {
                 splitRegex.push(';');
             }
             this._splitAt = new RegExp(splitRegex.join('|'));

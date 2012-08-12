@@ -1,10 +1,26 @@
 $(document).ready(function() {
-    $('#test').tagit({
+    $('#simple').tagit({
+        select: true,
+        triggerKeys: ['comma', 'enter', 'space', 'semicolon', 'tab']
+    });
+
+    $('#autocomplete').tagit({
         select: true,
         triggerKeys: ['comma', 'enter', 'space', 'semicolon', 'tab'],
-        tagSource: [],
-        editOnClick: true,
-        initialTags: [],
-        callbackOnInitialTagAdd: true
+    });
+
+    $('#sortable').tagit({
+        select: true,
+        triggerKeys: ['comma', 'enter', 'space', 'semicolon', 'tab'],
+    });
+
+    $('#paste').tagit({
+        select: true,
+        triggerKeys: ['comma', 'enter', 'space', 'semicolon', 'tab'],
+    });
+
+    $('#editOnClick').tagit({
+        select: true,
+        triggerKeys: ['comma', 'enter', 'space', 'semicolon', 'tab'],
     });
 });

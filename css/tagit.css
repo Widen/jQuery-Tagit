@@ -64,6 +64,7 @@ ul.tagit {
     border: 1px solid #E5E5E5;
     background: #fff;
     color: #555;
+    float: left;
 }
 
 ul.tagit li {

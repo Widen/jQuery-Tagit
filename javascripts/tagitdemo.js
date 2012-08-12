@@ -1,26 +1,33 @@
 $(document).ready(function() {
-    $('#simple').tagit({
+    $('#simple > ul').tagit({
         select: true,
         triggerKeys: ['comma', 'enter', 'space', 'semicolon', 'tab']
     });
 
-    $('#autocomplete').tagit({
+    $('#autocomplete > ul').tagit({
         select: true,
         triggerKeys: ['comma', 'enter', 'space', 'semicolon', 'tab'],
+        tagSource: ['one', 'two', 'three', 'four', 'five', 'six']
     });
 
-    $('#sortable').tagit({
+    $('#sortable > ul').tagit({
         select: true,
         triggerKeys: ['comma', 'enter', 'space', 'semicolon', 'tab'],
+        sortable: true
     });
 
-    $('#paste').tagit({
+    $('#editOnClick > ul').tagit({
         select: true,
         triggerKeys: ['comma', 'enter', 'space', 'semicolon', 'tab'],
+        editOnClick: true
     });
 
-    $('#editOnClick').tagit({
-        select: true,
-        triggerKeys: ['comma', 'enter', 'space', 'semicolon', 'tab'],
+    $('a.displaySelect').click(function() {
+        var select = $(this).parent('div').find('select');
+        var children = "";
+        select.children().each(function(){
+            children += $(this).val() + " : " + $(this).text() + "\n";
+        });
+        alert("Select options [value: text]...\n\n" + children);
     });
 });

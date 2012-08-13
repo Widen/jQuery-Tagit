@@ -133,13 +133,13 @@
 
         _initPasteSplitter: function() {
             var splitRegex = [];
-            if ($.inArray('space', this.options.triggerKeys) > -1) {
+            if ($.inArray('space', this.options.triggerKeys) >= 0) {
                 splitRegex.push(' ');
             }
-            if ($.inArray('comma', this.options.triggerKeys) > -1) {
+            if ($.inArray('comma', this.options.triggerKeys) >= 0) {
                 splitRegex.push(',');
             }
-            if ($.inArray('semicolon', this.options.triggerKeys) > -1) {
+            if ($.inArray('semicolon', this.options.triggerKeys) >= 0) {
                 splitRegex.push(';');
             }
             this._splitAt = new RegExp(splitRegex.join('|'));
@@ -269,11 +269,15 @@
             //setup blur handler
             this.input.blur(function (e) {
                 if (self.input.val()) {
-                    self._addTag(self.input.val(), self.input.data('value'));
-                }
+                    setTimeout(function() {
+    					self._addTag(self.input.val(), self.input.data('value'));
+					}, 400);
+				}
                 else if (self.input.data().editing) {
-                    self._handleBlurOnEditingEmptyTag();
-                }
+					setTimeout(function () {
+						self._handleBlurOnEditingEmptyTag();
+					}, 400);
+				}
             });
 
             //define missing trim function for strings

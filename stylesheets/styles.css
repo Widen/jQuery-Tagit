@@ -17,6 +17,10 @@ H1 {
     padding: 10px;
 }
 
+.endingRemark {
+    margin-top: 30px;
+}
+
 UL.tagit {
 	margin-left: 0px;
 	float: left;

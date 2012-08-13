@@ -5,6 +5,7 @@
     <title></title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.0.4/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
     <link href="css/tagit.css" rel="stylesheet" type="text/css"/>
     <link href="stylesheets/styles.css" rel="stylesheet" type="text/css"/>
     <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
@@ -13,29 +14,54 @@
     <script src="javascripts/tagitdemo.js"></script>
 </head>
 <body>
-    <h1>Widen Enterprises Fork of jQuery-Tagit (demo still in progress)</h1>
-    <div id="simple">
-        <h3>Simple Tagging Example</h3>
-        <ul/>
-        <a href="#" class="displaySelect">display select values</a>
-    </div>
-    <br/>
+    <h1>Widen Enterprises Fork of jQuery-Tagit</h1>
+    <div id="examples">
+        <div id="simple" class="example">
+            <h3>Simple Tagging Example</h3>
+            <p>
+                If your tagging box is part of a form, you may want to specify <code>select: true</code>.  Tagit will
+                then store all tags values in a hidden <code>&ltselect&gt</code> element.  Each <code>&ltoption&gt</code>
+                element will contain the URI encoded tag name.  In this example, and all examples that follow, tag delimiters
+                are comma, enter, space, semicolon, and tab.  These are configurable.  See the <code>triggerKeys</code> option.
+                Also note that you can paste tags in, and they will be delimited using any declared printable trigger keys.
+                Tags can be removed by clicking on the 'x' icon, or simply backspacing (twice).
+            </p>
+            <ul></ul>
+            <a href="#" class="btn btn-primary displaySelect">display select values</a>
+        </div>
+        <br/>
 
-    <div id="autocomplete">
-        <h3>Autocompleter Example</h3>
-        <ul/>
-    </div>
-    <br/>
+        <div id="autocomplete" class="example">
+            <h3>Autocompleter Example</h3>
+            <p>
+                Tagit makes use of jQuery UI Autocomplete.  Simply specify an array of values to make available to the
+                autocompleter via the <code>tagSource</code> option.  In this example, strings 'one' through 'six' are
+                available for autocompletion.
+            </p>
+            <ul></ul>
+        </div>
+        <br/>
 
-    <div id="sortable">
-        <h3>"Sortable" Example</h3>
-        <ul/>
-    </div>
-    <br/>
+        <div id="sortable" class="example">
+            <h3>"Sortable" Example</h3>
+            <p>
+                Tagit also makes use of jQuey UI Sortable.  Simply specify <code>sortable: true</code> when initializing
+                your tagging box to allow users to rearrange tags by clicking and dragging.  Specify <code>sortable: 'handle'</code>
+                to include a drag handle on each tag.  This example includes drag handles.  Without drag handles, the entire
+                tag is draggable.
+            </p>
+            <ul></ul>
+        </div>
+        <br/>
 
-    <div id="editOnClick">
-        <h3>Edit Existing Tags Example</h3>
-        <ul></ul>
+        <div id="editOnClick" class="example">
+            <p>
+                To edit an existing tag, simply specify <code>editOnClick: true</code> during initialization.  You may
+                then edit a tag simply by clicking on it.
+            </p>
+            <h3>Edit Existing Tags Example</h3>
+            <ul></ul>
+        </div>
     </div>
 </body>
 </html>

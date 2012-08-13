@@ -75,6 +75,7 @@ ul.tagit li {
 }
 
 ul.tagit.ui-sortable li.tagit-choice a.ui-icon.ui-icon-grip-dotted-vertical{
+    background:url(icon-drag.gif)  center left no-repeat;
     float: left;
     width: 12px;
     margin-left: -5px;

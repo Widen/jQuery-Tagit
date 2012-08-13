@@ -13,7 +13,7 @@ $(document).ready(function() {
     $('#sortable > ul').tagit({
         select: true,
         triggerKeys: ['comma', 'enter', 'space', 'semicolon', 'tab'],
-        sortable: true
+        sortable: 'handle'
     });
 
     $('#editOnClick > ul').tagit({
@@ -30,4 +30,14 @@ $(document).ready(function() {
         });
         alert("Select options [value: text]...\n\n" + children);
     });
+
+    $('ul.tagit').focusin(function() {
+        if (!$(this).hasClass('selected')) {
+            $(this).addClass('selected');
+        }
+    })
+    .focusout(function(event) {
+        $(this).removeClass('selected');
+    });
+
 });

@@ -329,7 +329,7 @@
 
         _popSelect:function (tag) {
             $('option:eq(' + tag.index + ')', this.select).remove();
-            this.select.change();
+            if (this.select) this.select.change();
         },
 
         _addSelect:function (tag) {

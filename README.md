@@ -1,4 +1,4 @@
-It depends on [jQuery 1.7.2](http://jquery.com). and [jQuery-ui 1.8](http://jqueryui.com) The _jQuery Tagit Plugin_ transforms an html unordered list into a unique tagging plugin.
+It depends on [jQuery 1.7.2](http://jquery.com), [jQuery-ui 1.8](http://jqueryui.com), and [Ben Alman's outside events plugin](http://benalman.com/projects/jquery-outside-events-plugin/). The _jQuery Tagit Plugin_ transforms an html unordered list into a unique tagging plugin.
 
 Why unique? Because jQuery Tagit uses jQuery UI's auto-complete plugin to supply suggestions to users as they type and has some awesome features like sortable and editable tags.
 
@@ -154,6 +154,13 @@ Why unique? Because jQuery Tagit uses jQuery UI's auto-complete plugin to supply
       <td>Bool</td>
       <td>false</td>
       <td>Option to receive a tagsChanged callback when adding initial tags</td>
+    </tr>
+
+    <tr>
+      <td>extraOutsideEvents</td>
+      <td>Array of Strings</td>
+      <td>[] ('clickoutside' is a mandatory included outside event)</td>
+      <td>Outside events on the input element that result in completion of a tag</td>
     </tr>
   </tbody>
 </table>

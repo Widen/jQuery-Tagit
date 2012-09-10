@@ -48,7 +48,12 @@
             editOnClick:false,
             //true to receive a tagsChanged callback when adding initial tags
             // (false for backwards compatibility)
-            callbackOnInitialTagAdd:false
+            callbackOnInitialTagAdd:false,
+            //Additional 'outside' events to listen for on the tag input element.  See
+            // http://benalman.com/code/projects/jquery-outside-events/docs/files/jquery-ba-outside-events-js.html for more details.
+            //clickoutside is already used, please specify custom outside events or other "native" outside events here.  Note: Do not use
+            //focusoutside, as this does not work as expected in IE.
+            extraOutsideEvents:[]
         },
 
         _splitAt:/\ |,/g,
@@ -66,9 +71,12 @@
             sorting:-1
         },
 
-        _handlingEditTag: false,
+        _outsideEvents:['clickoutside'],
 
-        _handleEditTag: function($tagEl) {
+        _handlingEditTag:false,
+
+
+        _handleEditTag:function ($tagEl) {
             this._handlingEditTag = true;
             var tagWidth = $tagEl.width();
             var index = $tagEl.index();
@@ -80,7 +88,7 @@
                 .data().editing = true;
 
             //to ensure the cursor is placed after the last character in IE, and ensure the value is not cleared after focusing
-            setTimeout(function() {
+            setTimeout(function () {
                 editingTag.find('input').focus().val(tagText);
             }, 400);
 
@@ -90,7 +98,7 @@
             this._handlingEditTag = false;
         },
 
-        _handleUpdateEditedTag: function(tag) {
+        _handleUpdateEditedTag:function (tag) {
             this.input.data().editing = false;
             var lastLi = this.element.children('li').last();
             if (lastLi.is(this.input.parent())) {
@@ -109,7 +117,7 @@
             }
         },
 
-        _handleDuplicateEditedTag: function(tag) {
+        _handleDuplicateEditedTag:function (tag) {
             this._popTag(tag);
 
             var lastLi = this.element.children('li').last();
@@ -121,7 +129,7 @@
             this.input.data().editing = false;
         },
 
-        _handleBlurOnEditingEmptyTag: function() {
+        _handleBlurOnEditingEmptyTag:function () {
             this._popTagAtIndex(this.input.parent().index());
             var lastLi = this.element.children('li').last();
             if (!this.input.parent().is(lastLi)) {
@@ -131,7 +139,7 @@
             this.input.data().editing = false;
         },
 
-        _initPasteSplitter: function() {
+        _initPasteSplitter:function () {
             var splitRegex = [];
             if ($.inArray('space', this.options.triggerKeys) >= 0) {
                 splitRegex.push(' ');
@@ -176,6 +184,7 @@
             //setup click handler
             $(this.element).click(function (e) {
                 if ($(e.target).hasClass('tagit-close')) {
+
                     // Removes a tag when the little 'x' is clicked.
                     var parent = $(e.target).parent();
 
@@ -190,9 +199,14 @@
                         self.input.autocomplete('search');
                     }
                     else if (self.options.editOnClick && $(e.target).hasClass('tagit-text')) {
+                        if (self.input.data().editing) {
+                            self._addTag(self.input.val());
+                        }
                         self._handleEditTag($(e.target).parents('.tagit-choice'));
                     }
                 }
+
+                return false;
             });
 
             //setup autocomplete handler
@@ -201,27 +215,27 @@
             this.options.source = this.options.tagSource;
             this.options.select = function (event, ui) {
                 self.input.data('autoCompleteTag', true);
-            clearTimeout(self.timer);
-            if (self.options.maxTags !== undefined && self.tagsArray.length == self.options.maxTags) {
-                self.input.val("");
-            }
-            else {
-                if (ui.item.label === undefined)
-                    self._addTag(ui.item.value);
-                else
-                    self._addTag(ui.item.label, ui.item.value);
-            }
-
-            return false;
-        },
-
-            this.options.focus = function (event, ui) {
-                if (ui.item.label !== undefined && /^key/.test(event.originalEvent.originalEvent.type)) {
-                    self.input.val(ui.item.label);
-                    self.input.data('value', ui.item.value);
-                    return false;
+                clearTimeout(self.timer);
+                if (self.options.maxTags !== undefined && self.tagsArray.length == self.options.maxTags) {
+                    self.input.val("");
                 }
-            };
+                else {
+                    if (ui.item.label === undefined)
+                        self._addTag(ui.item.value);
+                    else
+                        self._addTag(ui.item.label, ui.item.value);
+                }
+
+                return false;
+            },
+
+                this.options.focus = function (event, ui) {
+                    if (ui.item.label !== undefined && /^key/.test(event.originalEvent.originalEvent.type)) {
+                        self.input.val(ui.item.label);
+                        self.input.data('value', ui.item.value);
+                        return false;
+                    }
+                };
             this.options.autoFocus = !this.options.allowNewTags;
             this.input.autocomplete(this.options);
             this.options.select = os;
@@ -262,22 +276,20 @@
             this.input.bind("paste", function (e) {
                 if (self.options.blurOnPaste) {
                     var input = $(this);
-                    self.timer = setTimeout(function () { input.blur(); }, 0);
+                    self.timer = setTimeout(function () {
+                        input.blur();
+                    }, 0);
                 }
             });
 
             //setup blur handler
-            this.input.blur(function (e) {
+            this.input.on(this.options.extraOutsideEvents.concat(this._outsideEvents).join(' '), function (e) {
                 if (self.input.val()) {
-                    setTimeout(function() {
-    					self._addTag(self.input.val(), self.input.data('value'));
-					}, 400);
-				}
-                else if (self.input.data().editing) {
-					setTimeout(function () {
-						self._handleBlurOnEditingEmptyTag();
-					}, 400);
-				}
+                    self._addTag(self.input.val(), self.input.data('value'));
+                }
+                else if (self.input.data().editing && !self.input.val()) {
+                    self._handleBlurOnEditingEmptyTag();
+                }
             });
 
             //define missing trim function for strings
@@ -301,8 +313,8 @@
                 var soptions = {
                     items:'.tagit-choice',
                     containment:'parent',
-                    opacity: 0.6,
-                    tolerance: 'pointer',
+                    opacity:0.6,
+                    tolerance:'pointer',
                     start:function (event, ui) {
                         self._sortable.tag = $(ui.item);
                         self._sortable.origIndex = self._sortable.tag.index();
@@ -310,7 +322,7 @@
                     update:function (event, ui) {
                         self._sortable.newIndex = self._sortable.tag.index();
                         self._moveTag(self._sortable.origIndex, self._sortable.newIndex);
-                        if(self.options.tagsChanged){
+                        if (self.options.tagsChanged) {
                             var tag = self.tagsArray[self._sortable.newIndex];
                             self.options.tagsChanged(tag.value, 'moved', tag.element);
                         }
@@ -328,10 +340,8 @@
         },
 
         _popSelect:function (tag) {
-            if (this.select) {
-                $('option:eq(' + tag.index + ')', this.select).remove();
-                this.select.change();
-            }
+            $('option:eq(' + tag.index + ')', this.select).remove();
+            this.select.change();
         },
 
         _addSelect:function (tag) {
@@ -369,7 +379,7 @@
         },
 
         _popTagAtIndex:function (tagIndex) {
-            this._popTag({index: tagIndex});
+            this._popTag({index:tagIndex});
         },
 
         _addTag:function (label, value) {
@@ -526,12 +536,12 @@
 
         },
 
-        _moveTag: function (old_index, new_index) {
+        _moveTag:function (old_index, new_index) {
             this.tagsArray.splice(new_index, 0, this.tagsArray.splice(old_index, 1)[0]);
             for (var ind in this.tagsArray)
                 this.tagsArray[ind].index = ind;
 
-            if(this.options.select){
+            if (this.options.select) {
                 $('option:eq(' + old_index + ')', this.select).insertBefore($('option:eq(' + new_index + ')', this.select));
             }
         },
@@ -564,13 +574,13 @@
         },
 
         add:function (label, value) {
-            if(typeof(label) == "object")
+            if (typeof(label) == "object")
                 return this._addTag(label.label, label.value);
             else
                 return this._addTag(label, value);
         },
 
-        autocomplete: function(){
+        autocomplete:function () {
             return this.input.data("autocomplete");
         },
 
@@ -582,11 +592,11 @@
 
             return {
                 label:label,
-                labelHtml: function() {
+                labelHtml:function () {
                     return encodeHtml(label)
                 },
                 value:(value === undefined ? label : value),
-                valueUriEncoded: function() {
+                valueUriEncoded:function () {
                     return encodeURIComponent(this.value);
                 },
                 element:element,

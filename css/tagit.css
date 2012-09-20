@@ -8,7 +8,6 @@ ul.tagit li.tagit-choice .tagit-text {
 }
 
 .ui-autocomplete {
-    background-color: #fff;
     position: absolute;
     cursor: default;
     list-style: none;

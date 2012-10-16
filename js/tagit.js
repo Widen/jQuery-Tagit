@@ -277,7 +277,7 @@
                 if (self.options.blurOnPaste) {
                     var input = $(this);
                     self.timer = setTimeout(function () {
-                        input.blur();
+                        input.trigger('clickoutside');
                     }, 0);
                 }
             });
